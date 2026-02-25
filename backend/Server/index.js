@@ -1,17 +1,17 @@
 const express = require("express");
-const cors = require("cors");
-const path = require("path");
+const mongoose = require("mongoose");
+const cors = require("cors"); // IMPORTANT
+const userRoutes = require("./routes/user.routes");
 
 const app = express();
 
-app.use(cors());
+app.use(cors());              // VERY IMPORTANT
 app.use(express.json());
-app.use("/uploads", express.static("uploads"));
 
-// ✅ import route
-const userRoutes = require("./routes/userRoutes");
+mongoose.connect("mongodb://127.0.0.1:27017/registerApp")
+  .then(() => console.log("MongoDB Connected"))
+  .catch(err => console.log("Mongo Error:", err));
 
-// ✅ use route
 app.use("/api/users", userRoutes);
 
 app.listen(5000, () => {

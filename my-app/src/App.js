@@ -8,6 +8,7 @@ function App() {
  <>
       <Toaster position="top-right" />
       <Register />
+      <Toaster/>
     </>
   );
 }

@@ -1,88 +1,89 @@
-import React, { useState, useEffect } from "react";
+import  { useState, useEffect } from "react";
 import axios from "axios";
-
 import toast from "react-hot-toast";
-export default function Register( )
-{
+
+export default function Register() {
+
   const [users, setUsers] = useState([]);
- const [form, setForm] = useState({
-  email: "",
-  gender: "",
-  address: ""
-});
-  const [photo, setPhoto] = useState(null);
+
+  const [form, setForm] = useState({
+    email: "",
+    gender: "",
+    address: ""
+  });
   const [editId, setEditId] = useState(null);
 
   useEffect(() => {
     fetchUsers();
   }, []);
 
-  const fetchUsers = async () => {
-    const res = await axios.get("http://localhost:5000/api/users");
-    setUsers(res.data);
+ const fetchUsers = async () => {
+  const res = await axios.get("http://localhost:5000/api/users");
+  setUsers(res.data);
+};
+
+const handleSubmit = async (e) => {
+  e.preventDefault();
+ 
+
+  if (!form.email.trim()) {
+    toast.error("Email is required");
+    return;
+  }
+
+  if (!form.address.trim()) {
+    toast.error("Address is required");
+    return;
+  }
+
+  if (!form.gender) {
+    toast.error("Please select gender");
+    return;
+  }
+
+  // ✅ Create payload here
+  const payload = {
+    email: form.email,
+    gender: form.gender,
+    address: form.address
   };
 
-  const handleSubmit = async (e) => {
-  e.preventDefault();
-
-  // 🔥 Validation
-if (!form.email.trim()) {
-  toast.error("Email is required");
-  return;
-}
-
-if (!form.address.trim()) {
-  toast.error("Address is required");
-  return;
-}
-
-if (!form.gender) {
-  toast.error("Please select gender");
-  return;
-}
-
   try {
-    const formData = new FormData();
- formData.append("email", form.email);
-formData.append("gender", form.gender);
-formData.append("address", form.address);
-    if (photo) formData.append("photo", photo);
-
+    console.log("Payload to be sent:", payload); // Debugging log
     if (editId) {
       await axios.put(
         `http://localhost:5000/api/users/${editId}`,
-        formData
+        payload
       );
       toast.success("User updated successfully");
       setEditId(null);
     } else {
       await axios.post(
         "http://localhost:5000/api/users",
-        formData
+        payload
       );
       toast.success("User registered successfully");
     }
 
     fetchUsers();
     setForm({ email: "", gender: "", address: "" });
-    setPhoto(null);
 
   } catch (error) {
-    toast.error("Something went wrong");
+      console.error("Error in handleSubmit:", error); // Debugging log
+  toast.error("Something went wrong");
   }
 };
-
   const handleDelete = async (id) => {
     await axios.delete(`http://localhost:5000/api/users/${id}`);
     fetchUsers();
   };
 
   const handleEdit = (user) => {
-   setForm({
-  email: user.email,
-  gender: user.gender,
-  address: user.address
-});
+    setForm({
+      email: user.email,
+      gender: user.gender,
+      address: user.address
+    });
     setEditId(user._id);
   };
 
@@ -96,12 +97,14 @@ formData.append("address", form.address);
           value={form.email}
           onChange={e => setForm({ ...form, email: e.target.value })}
         />
-      <textarea
-  placeholder="Enter Address"
-  value={form.address}
-  onChange={e => setForm({ ...form, address: e.target.value })}
-  rows="3"
-/>
+
+        <textarea
+          placeholder="Enter Address"
+          value={form.address}
+          onChange={e => setForm({ ...form, address: e.target.value })}
+          rows="3"
+        />
+
         <select
           value={form.gender}
           onChange={e => setForm({ ...form, gender: e.target.value })}
@@ -110,8 +113,6 @@ formData.append("address", form.address);
           <option value="Male">Male</option>
           <option value="Female">Female</option>
         </select>
-
-        <input type="file" onChange={e => setPhoto(e.target.files[0])} />
 
         <button type="submit">
           {editId ? "Update" : "Register"}
@@ -125,9 +126,8 @@ formData.append("address", form.address);
       <table border="1" cellPadding="10">
         <thead>
           <tr>
-            <th>Photo</th>
             <th>Email</th>
-           <th>Address</th>
+            <th>Address</th>
             <th>Gender</th>
             <th>Edit</th>
             <th>Delete</th>
@@ -137,16 +137,8 @@ formData.append("address", form.address);
         <tbody>
           {users.map(user => (
             <tr key={user._id}>
-              <td>
-                {user.photo && (
-                  <img
-                    src={`http://localhost:5000/uploads/${user.photo}`}
-                    width="50"
-                  />
-                )}
-              </td>
               <td>{user.email}</td>
-            <td>{user.address}</td>
+              <td>{user.address}</td>
               <td>{user.gender}</td>
               <td>
                 <button onClick={() => handleEdit(user)}>Edit</button>
