@@ -11,6 +11,7 @@ export default function Register() {
     gender: "",
     address: ""
   });
+  const [file, setFile] = useState(null);
   const [editId, setEditId] = useState(null);
 
   useEffect(() => {
