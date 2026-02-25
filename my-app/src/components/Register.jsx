@@ -70,7 +70,7 @@ const handleSubmit = async (e) => {
 
   } catch (error) {
       console.error("Error in handleSubmit:", error); // Debugging log
-  toast.error("Something went wrong");
+   console.error("Something went wrong");
   }
 };
   const handleDelete = async (id) => {
